@@ -1,0 +1,149 @@
+{% load staticfiles %}
+<!doctype html>
+<html lang="en-US">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Uber Fare Estimator</title>
+	<meta name="description" content="Estimate how much your ride will cost and how long it will take to get a pickup right now; for all Uber services. Just enter your starting point and destination.">
+	<meta property="og:title" content="Uber Fare Estimator" />
+	<meta property="og:type" content="website" />
+	<meta property="og:description" content="How much Uber will cost? Find out here." /> 
+	<meta property="og:site_name" content="Uber Fare Estimator" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-title" content="UberFare">
+	<meta name="application-name" content="UberFare">
+
+	<style type="text/css">
+	@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 300;
+	src: local('Roboto Light'), local('Roboto-Light'),
+		url(http://{{site_name}}/assets/roboto.woff2) format('woff2'),
+		url(http://{{site_name}}/assets/roboto.woff) format('woff'),
+		url(http://{{site_name}}/assets/roboto.ttf) format('truetype');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+	}
+	</style>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Francois+One" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/uberfareestimator.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'uber-fonts/2.0.1/fresh.css' %}" />
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="//d1a3f4spazzrp4.cloudfront.net/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="{% static 'js/ie-emulation-modes-warning.js' %}"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+	<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+</head>
+
+
+<body >
+
+    <div class="container">
+      <div class="header clearfix" >
+        <h3>UberFareEstimator</h3>
+      </div>
+      <div class="footer" >
+        <p >New to Uber? <a href="https://www.uber.com/invite/uberfareestimate">Get your first ride free!</a></p>
+      </div>
+
+	  {% if price_estimates.queried %}
+      <div class="jumbotron" >
+      	<div class="table">
+      	<center>
+      	<table class="table" >
+      	{% for price in price_estimates.prices %}
+
+      	<tr>
+      		<th >{{ price.localized_display_name }}</th>
+      		<td >{{ price.estimate }}</td>
+      	</tr>
+
+      	{% empty %}
+      		<tr>
+      			<td class="warning" >Something went wrong but please <a href="/" >give it another drive.</a> ;)</td>
+      		</tr>
+      	{% endfor %}
+     	</table>
+      	</center>
+        </div>
+      </div>
+      <div class="footer" >
+        <p><a href="/">Get Uber Fare Estimates For Other Routes!</a></p>
+      </div> <br />
+
+	  {% else %}      
+
+      <form method="get" action="">
+      <div class="jumbotron" >
+
+			<div class="input-group input-group-lg">
+			<span class="input-group-addon" id="sizing-addon1" ><img src="{% static 'greeen-pin-md.png' %}" /></span>
+			<input type="text" class="form-control" placeholder="START" aria-describedby="sizing-addon1"  id="start" name="start_address" value="{{price_estimates.start_address}}">
+			</div>
+			<br />
+			<div class="input-group input-group-lg">
+			<span class="input-group-addon" id="sizing-addon1" ><img src="{% static 'red-pin-md.png' %}" /></span>
+			<input type="text" class="form-control" placeholder="DESTINATION" aria-describedby="sizing-addon1"  id="destination" name="end_address" value="{{price_estimates.end_address}}">
+			</div>
+
+			<br />
+			<div class="btn-group">
+			<input class="btn btn-default btn-lg estimate" type="submit" data-toggle="dropdown" aria-expanded="false"  value="ESTIMATE" />
+			
+			
+			</div>
+			
+			<div class="startdetails" >
+				<input type="hidden" name="startlat" data-geo="lat">
+				<input type="hidden" name="startlng" data-geo="lng">
+			</div>
+			<div class="enddetails" >
+				<input type="hidden" name="endlat" data-geo="lat">
+				<input type="hidden" name="endlng" data-geo="lng">
+			</div>
+
+      </div>
+  	  </form>
+
+  	  {% endif %}
+
+      <footer class="footer">
+        <p>Uber fare estimates are directly from Uber® but {{site_name}} is not their entity.</p>
+        <p >New to Uber? <a href="https://www.uber.com/invite/uberfareestimate">Get your first ride free!</a></p>
+      </footer>
+
+    </div> <!-- /container -->
+
+
+
+<script src="//maps.googleapis.com/maps/api/js?sensor=false&libraries=places"></script>
+<script src="//do0gjbv4c0fyr.cloudfront.net/js/jquery.geocomplete.min.js"></script>
+	<script>
+	$(function() {
+		$("#start").geocomplete({
+                        details: ".startdetails",
+			detailsAttribute: "data-geo"
+		});
+		$("#destination").geocomplete({
+                        details: ".enddetails",
+			detailsAttribute: "data-geo"
+		});
+	});
+	</script>
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="//do0gjbv4c0fyr.cloudfront.net/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>
